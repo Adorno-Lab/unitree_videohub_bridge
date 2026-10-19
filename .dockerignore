@@ -1,0 +1,6 @@
+.git
+build/
+install/
+log/
+CMakeLists.txt.user
+**/__pycache__

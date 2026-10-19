@@ -1,0 +1,6 @@
+# Parameters of unitree_videohub_bridge_node for the Unitree G1, loaded after unitree_videohub_bridge.yaml.
+# The head camera of the G1 (Intel RealSense, colour stream, /dev/video4, owned by videohub_pc4) is mounted upright.
+/**:
+  ros__parameters:
+    # Clockwise rotation of the image, in degrees: 0, 90, 180, or 270 (needs transcode: true unless 0).
+    rotation: 0
