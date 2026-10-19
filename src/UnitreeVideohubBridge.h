@@ -32,12 +32,12 @@
  *
  *          - transcode (default): the JPEG is decoded directly at a reduced resolution (1/downscale; libjpeg scales
  *            in the DCT, which is cheaper than decoding the full frame and resizing it), rotated by rotation degrees
- *            (the H1 camera is mounted upside down), and published with an image_transport publisher on <topic>.
+ *            (the H1 camera is mounted upside down), and published with an image_transport publisher on `<topic>`.
  *            Every installed transport plugin is then available: ffmpeg (H.264, the least bandwidth), compressed
  *            (JPEG), and raw. A plugin encodes only while its topic has subscribers, and the frame is not decoded at
  *            all while no transport has subscribers.
  *          - passthrough (transcode false): the JPEG of videohub is published as it comes, at full resolution, as
- *            sensor_msgs/CompressedImage on <topic>/compressed (the topic of the "compressed" plugin). No decoding on
+ *            sensor_msgs/CompressedImage on `<topic>/compressed` (the topic of the "compressed" plugin). No decoding on
  *            the robot, but ~145 KB per frame. It cannot be rotated.
  */
 #pragma once
@@ -62,29 +62,28 @@ namespace unitree_videohub_bridge
 /**
  * @brief Republishes the frames of videohub on ROS 2.
  *
- *        Parameters:
- *          - domain_id (int, default 0):            DDS domain of the Unitree network (0 on the robot).
- *          - network_interface (string, "eth0"):    interface on the Unitree network (192.168.123.x).
- *          - service_name (string, "videohub"):     name of the videohub RPC service.
- *          - rate_hz (double, 30.0):                maximum rate of the requests to videohub.
- *          - rpc_timeout_sec (double, 1.0):         timeout of each request.
- *          - frame_id (string, "head_camera_color_optical_frame"): frame_id of the published images.
- *          - topic (string, "/camera/image_raw"):  base topic of the images.
- *          - skip_duplicates (bool, true):          do not publish a frame identical to the previous one.
- *          - transcode (bool, true):                decode, downscale, rotate, and publish through image_transport
- *                                                   (see above); false publishes the JPEG of videohub as it comes.
- *          - downscale (int, 2):                    1, 2, 4, or 8: the resolution is divided by it when transcoding
- *                                                   (1920x1080 -> 960x540, 480x270, 240x134). Rounded down to even
- *                                                   sizes, as H.264 (yuv420p) needs them.
- *          - rotation (int, 0):                     0, 90, 180, or 270: clockwise rotation of the image, in degrees,
- *                                                   when transcoding. 180 on the H1, whose camera is upside down.
- *                                                   Must be 0 without transcode.
+ * @details The modes of publication are described in the documentation of the file (UnitreeVideohubBridge.h).
+ * ROS parameters of the node:
  *
- *        The parameters of the transport plugins follow the image_transport conventions, e.g.
- *        camera.image_raw.ffmpeg.encoder or camera.image_raw.compressed.jpeg_quality (see
- *        config/unitree_videohub_bridge.yaml).
+ * | Parameter | Type | Default | Description |
+ * |---|---|---|---|
+ * | `domain_id` | int | `0` | DDS domain of the Unitree network (0 on the robot) |
+ * | `network_interface` | string | `"eth0"` | interface on the Unitree network (192.168.123.x) |
+ * | `service_name` | string | `"videohub"` | name of the videohub RPC service |
+ * | `rate_hz` | double | `30.0` | maximum rate of the requests to videohub |
+ * | `rpc_timeout_sec` | double | `1.0` | timeout of each request |
+ * | `frame_id` | string | `"head_camera_color_optical_frame"` | frame_id of the published images |
+ * | `topic` | string | `"/camera/image_raw"` | base topic of the images |
+ * | `skip_duplicates` | bool | `true` | do not publish a frame identical to the previous one |
+ * | `transcode` | bool | `true` | decode, downscale, rotate, and publish through image_transport; false publishes the JPEG of videohub as it comes |
+ * | `downscale` | int | `2` | 1, 2, 4, or 8: the resolution is divided by it when transcoding (1920x1080 to 960x540, 480x270, 240x134), rounded down to even sizes, as H.264 (yuv420p) needs them |
+ * | `rotation` | int | `0` | 0, 90, 180, or 270: clockwise rotation of the image, in degrees, when transcoding (180 on the H1, whose camera is upside down); must be 0 without transcode |
  *
- *        The QoS is the sensor-data profile, but reliable, so that both best-effort and reliable subscribers match.
+ * The parameters of the transport plugins follow the image_transport conventions, e.g.
+ * `camera.image_raw.ffmpeg.encoder` or `camera.image_raw.compressed.jpeg_quality` (see
+ * config/unitree_videohub_bridge.yaml).
+ *
+ * The QoS is the sensor-data profile, but reliable, so that both best-effort and reliable subscribers match.
  */
 class UnitreeVideohubBridge : public rclcpp::Node
 {

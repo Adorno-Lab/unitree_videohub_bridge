@@ -1,3 +1,5 @@
+![Static Badge](https://img.shields.io/badge/Written_in-C%2B%2B17-blue)![GitHub License](https://img.shields.io/github/license/Adorno-Lab/unitree_videohub_bridge?color=orange)![Static Badge](https://img.shields.io/badge/status-experimental-red)[![Docs](https://img.shields.io/badge/docs-GitHub_Pages-green)](https://adorno-lab.github.io/unitree_videohub_bridge/)
+
 # unitree_videohub_bridge
 
 Publishes the head camera of Unitree robots (G1, H1) on ROS 2, **without stopping Unitree's videohub service**, which
@@ -14,18 +16,6 @@ ros2 launch unitree_videohub_bridge unitree_videohub_bridge_launch.py robot:=g1 
 # On any computer on the same ROS network
 ros2 run rqt_image_view rqt_image_view   # choose /camera/image_raw/ffmpeg in the list
 ```
-
-- [Why this package exists](#why-this-package-exists)
-- [How it works](#how-it-works)
-- [Rotation (H1)](#rotation-h1)
-- [How the compression works](#how-the-compression-works)
-- [Measurements](#measurements)
-- [Install](#install)
-- [Docker](#docker)
-- [Parameters](#parameters)
-- [Usage](#usage)
-- [Troubleshooting](#troubleshooting)
-- [Files](#files)
 
 ## Why this package exists
 
@@ -262,7 +252,7 @@ Set in [`config/unitree_videohub_bridge.yaml`](config/unitree_videohub_bridge.ya
 | `transcode` | `true` | decode, downscale, rotate, and publish through image_transport; `false`: the JPEG of videohub as it comes |
 | `downscale` | `2` | 1, 2, 4, or 8: 1920x1080 → 1920x1080, 960x540, 480x270, 240x134 |
 | `rotation` | `0` (G1), `180` (H1) | 0, 90, 180, or 270: clockwise rotation of the image, in degrees (needs `transcode: true` unless 0) |
-| `camera.image_raw.ffmpeg.*` | see the YAML | H.264 encoder settings (see [Step 3a](#step-3a-h264-transport-ffmpeg)) |
+| `camera.image_raw.ffmpeg.*` | see the YAML | H.264 encoder settings (see Step 3a above) |
 | `camera.image_raw.compressed.jpeg_quality` | `60` | JPEG quality of the `compressed` transport |
 
 The names of the transport parameters follow the topic: `/camera/image_raw` → `camera.image_raw.<transport>.*`. If
