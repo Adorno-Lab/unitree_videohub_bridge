@@ -198,31 +198,6 @@ The `compressed` plugin re-encodes each downscaled image as a JPEG of quality 60
 frame does not affect the next ones and a subscriber sees an image immediately. The price is about 6x the bandwidth
 of H.264. Use it if the H.264 stream shows artifacts on a lossy link.
 
-## Measurements
-
-Measured on a desktop computer with a fake videohub (built with the server API of `unitree_sdk2`): a panning 1080p
-scene of JPEG frames of ~145 KB, 18 new frames per second, as measured on the G1. Bandwidth is that of the serialized
-messages; CPU is that of the bridge process (decoding plus encoding), on the desktop.
-
-| Configuration | Per frame | Bandwidth | Bridge CPU |
-|---|---|---|---|
-| passthrough 1920x1080 JPEG (`transcode: false`) | 146 KB | 21.7 Mbit/s | 1 % |
-| 960x540 JPEG q80 | 50 KB | 7.4 Mbit/s | 11 % |
-| 960x540 JPEG q60 (`compressed`, default) | 35 KB | 5.3 Mbit/s | 11 % |
-| 960x540 H.264 crf 23 | 10 KB | 1.5 Mbit/s | 17 % |
-| **960x540 H.264 crf 28 (`ffmpeg`, default)** | **5.6 KB** | **0.8 Mbit/s** | **17 %** |
-| 480x270 JPEG q60 | 14 KB | 2.1 Mbit/s | 6 % |
-| 480x270 H.264 crf 28 (`downscale: 4`) | 2.3 KB | 0.35 Mbit/s | 8 % |
-
-All configurations delivered the full ~18 Hz, after decoding too.
-
-Caveats:
-- **The test scene is a flat illustration**, which compresses unusually well. The real camera, with texture and
-  sensor noise, needs more bandwidth for every option; the ranking holds. Measure on the robot with
-  `ros2 topic bw /camera/image_raw/ffmpeg`.
-- **CPU was measured on the desktop.** The ARM cores of the onboard computer are slower: expect several times these
-  values (a rough estimate). If it is too much, use `downscale: 4`.
-
 ## Install
 
 Dependencies that are not ROS packages, installed first:
