@@ -1,0 +1,8 @@
+# Parameters of unitree_videohub_bridge_node for the Unitree H1, loaded after unitree_videohub_bridge.yaml.
+# The head camera of the H1 is mounted upside down: its images are rotated by 180 degrees. The published images are
+# then upright, so frame_id must name the optical frame of the rotated image (the physical optical frame of the camera
+# rotated by 180 degrees about its z axis).
+/**:
+  ros__parameters:
+    # Clockwise rotation of the image, in degrees: 0, 90, 180, or 270 (needs transcode: true unless 0).
+    rotation: 180

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>unitree_videohub_bridge</name>
+  <version>0.1.0</version>
+  <description>Publishes the head camera of Unitree robots (G1, H1) on ROS 2, read through Unitree's videohub service with unitree_drivers, without stopping videohub: downscaled and optionally rotated through image_transport (H.264 with ffmpeg_image_transport, JPEG, raw), or the JPEG frames of videohub as they come.</description>
+  <maintainer email="juanjose.quirozomana@manchester.ac.uk">Juan Jose Quiroz Omana</maintainer>
+  <license>LGPL-2.1-or-later</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- unitree_drivers and unitree_sdk2 are not ROS packages: install them first (see the README). -->
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>image_transport</depend>
+  <depend>libopencv-dev</depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <!-- The transports of the transcoded images: H.264 and JPEG. -->
+  <exec_depend>ffmpeg_image_transport</exec_depend>
+  <exec_depend>compressed_image_transport</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

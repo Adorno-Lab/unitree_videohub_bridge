@@ -1,0 +1,58 @@
+# Parameters of unitree_videohub_bridge_node, shared by all the robots: republishes the head camera of a Unitree robot,
+# read through Unitree's videohub service (which owns the camera device), on ROS 2. The parameters that depend on the
+# robot are in <robot>.yaml (g1.yaml, h1.yaml), loaded after this file by the launch file, so they take precedence.
+#
+# Measured on the G1: service "videohub" on eth0, DDS domain 0, 1920x1080 JPEG of ~145 KB, ~16 ms per request,
+# ~18 new frames per second (faster requests return the same frame).
+#
+# Bandwidth at 18 Hz, measured with a fake videohub serving a panning 1080p scene of the same JPEG size (a flat
+# illustration: the real camera, with texture and noise, needs more for every option, but the ranking holds):
+#   passthrough 1920x1080 JPEG (transcode: false)   21.7 Mbit/s
+#   960x540 JPEG q60  (transport compressed)         5.3 Mbit/s
+#   960x540 H.264 crf 23 (transport ffmpeg)          1.5 Mbit/s
+#   960x540 H.264 crf 28 (transport ffmpeg)          0.8 Mbit/s   <- default
+#   480x270 H.264 crf 28 (downscale: 4)              0.35 Mbit/s
+# Check the real values on the robot with: ros2 topic bw /camera/image_raw/ffmpeg
+#
+# domain_id, network_interface, transcode, and downscale can also be set with the launch arguments of the same names.
+/**:
+  ros__parameters:
+    # Unitree network (unitree_sdk2): DDS domain 0 and the interface on 192.168.123.x on the robot.
+    domain_id: 0
+    network_interface: "eth0"
+    service_name: "videohub"
+
+    # Requests to videohub: maximum rate, and timeout of each request.
+    rate_hz: 30.0
+    rpc_timeout_sec: 1.0
+
+    # Published images. The same topics on every robot.
+    frame_id: "head_camera_color_optical_frame"
+    topic: "/camera/image_raw"
+    skip_duplicates: true
+
+    # true: decode at 1/downscale of the resolution (1, 2, 4, or 8: 1920x1080 -> 960x540, 480x270, 240x134), rotate by
+    # rotation degrees (set in <robot>.yaml), and publish through image_transport: the transports ffmpeg (H.264),
+    # compressed (JPEG), and raw, each encoded only while subscribed. false: the JPEG of videohub as it comes, on
+    # <topic>/compressed only (it cannot be rotated).
+    transcode: true
+    downscale: 2
+
+    # Parameters of the transport plugins. Their names follow the topic: /camera/image_raw -> camera.image_raw.
+    camera:
+      image_raw:
+        # H.264 (subscribe with the transport "ffmpeg"). libx264 without latency (no B-frames, no lookahead). crf sets
+        # the quality (lower: better and bigger; 23 is the default of x264, 28 is still clean at 960x540); a fixed
+        # bit_rate did not hold its target with libx264, so it is left unset. gop_size: one keyframe every 18 frames
+        # (~1 s): a subscriber that joins, or a frame lost on a best-effort link, recovers within ~1 s. Smaller is
+        # more robust to losses but bigger (5: +50 % at crf 28).
+        ffmpeg:
+          encoder: "libx264"
+          encoder_av_options: "preset:ultrafast,tune:zerolatency,crf:28"
+          gop_size: 18
+          max_b_frames: 0
+        # JPEG (subscribe with the transport "compressed"): each frame stands alone, so losses do not spread, but it
+        # needs ~6x the bandwidth of H.264. The default quality (95) is wasteful.
+        compressed:
+          format: "jpeg"
+          jpeg_quality: 60
