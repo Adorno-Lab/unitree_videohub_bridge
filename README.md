@@ -21,6 +21,7 @@ ros2 run rqt_image_view rqt_image_view   # choose /camera/image_raw/ffmpeg in th
 - [How the compression works](#how-the-compression-works)
 - [Measurements](#measurements)
 - [Install](#install)
+- [Docker](#docker)
 - [Parameters](#parameters)
 - [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
@@ -216,6 +217,32 @@ cd ~/ros2_ws
 colcon build --packages-select unitree_videohub_bridge
 ```
 
+## Docker
+
+[`docker/unitree_videohub_bridge/Dockerfile`](docker/unitree_videohub_bridge/Dockerfile) builds an image with the
+package and everything it needs to run: unitree_sdk2, unitree_drivers, and the `ffmpeg` and `compressed` transports.
+It starts from `murilomarinho/sas:jazzy` (ROS 2 Jazzy, OpenCV, Eigen, DQ Robotics, sas_cpp), the base image of the
+SAS drivers of the robots, so its layers are shared with those images. Building it needs internet access (it clones
+the dependencies).
+
+Build it from the root of the repository (the build context is the repository, which is copied into the image):
+
+```bash
+# On the computer that runs it
+docker build -t unitree_videohub_bridge -f docker/unitree_videohub_bridge/Dockerfile .
+
+# On a desktop computer, for the onboard computer of the robot (arm64)
+docker build --platform linux/arm64 -t unitree_videohub_bridge -f docker/unitree_videohub_bridge/Dockerfile .
+```
+
+Run it on the onboard computer, on the host network (it needs no access to the video devices). The image does not set
+`ROS_DOMAIN_ID`: pass the one of your ROS network with `-e`.
+
+```bash
+docker run -it --rm --net=host --ipc=host -e ROS_DOMAIN_ID=77 unitree_videohub_bridge \
+    bash -c "ros2 launch unitree_videohub_bridge unitree_videohub_bridge_launch.py robot:=g1"
+```
+
 ## Parameters
 
 Set in [`config/unitree_videohub_bridge.yaml`](config/unitree_videohub_bridge.yaml) (shared by the robots) and
@@ -297,3 +324,4 @@ request takes ~16 ms):
 | [`config/unitree_videohub_bridge.yaml`](config/unitree_videohub_bridge.yaml) | parameters shared by the robots, including the H.264 and JPEG settings |
 | [`config/g1.yaml`](config/g1.yaml), [`config/h1.yaml`](config/h1.yaml) | parameters of each robot (rotation) |
 | [`launch/unitree_videohub_bridge_launch.py`](launch/unitree_videohub_bridge_launch.py) | launch file (`robot:=g1` or `robot:=h1`) |
+| [`docker/unitree_videohub_bridge/Dockerfile`](docker/unitree_videohub_bridge/Dockerfile) | image with the package and its dependencies |
