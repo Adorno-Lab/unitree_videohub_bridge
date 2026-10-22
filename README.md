@@ -221,8 +221,11 @@ Build it from the root of the repository (the build context is the repository, w
 # On the computer that runs it
 docker build -t unitree_videohub_bridge -f docker/unitree_videohub_bridge/Dockerfile .
 
-# On a desktop computer, for the onboard computer of the robot (arm64)
+# On a desktop computer, for the onboard computer of the G1 (arm64)
 docker build --platform linux/arm64 -t unitree_videohub_bridge -f docker/unitree_videohub_bridge/Dockerfile .
+
+# On a desktop computer, for the onboard computer of the H1 (x86_64)
+docker build --platform linux/amd64 -t unitree_videohub_bridge -f docker/unitree_videohub_bridge/Dockerfile .
 ```
 
 Run it on the onboard computer, on the host network (it needs no access to the video devices). The image does not set
